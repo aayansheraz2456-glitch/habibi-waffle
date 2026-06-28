@@ -6,6 +6,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import FoodArt from "./FoodArt";
+import Churro3D from "./Churro3D";
 import Grain from "./Grain";
 import type { Category } from "../data/menu";
 
@@ -95,12 +96,16 @@ function Picture({
         {pic.word}
       </motion.span>
 
-      {/* food art */}
+      {/* food art (3D model for the ice-cream/waffle picture) */}
       <motion.div style={{ y: artY }} className="relative z-[3]">
-        <FoodArt
-          category={pic.slug}
-          className="h-[44vh] w-auto drop-shadow-[0_18px_28px_rgba(42,23,38,0.35)] sm:h-[56vh]"
-        />
+        {pic.slug === "waffle" ? (
+          <Churro3D className="h-[60vh] w-[60vh] max-w-[92vw]" />
+        ) : (
+          <FoodArt
+            category={pic.slug}
+            className="h-[44vh] w-auto drop-shadow-[0_18px_28px_rgba(42,23,38,0.35)] sm:h-[56vh]"
+          />
+        )}
       </motion.div>
 
       {/* caption */}

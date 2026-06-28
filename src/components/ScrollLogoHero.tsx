@@ -45,7 +45,7 @@ export default function ScrollLogoHero() {
           >
             <div className="sheen relative overflow-hidden rounded-full drop-shadow-[0_24px_70px_rgba(230,57,139,0.45)]">
               <img
-                src="/images/logo-waffle.png"
+                src="/images/logo-waffle.webp"
                 alt="Habibi Waffle"
                 className="h-[62vh] max-h-[600px] w-auto select-none"
                 draggable={false}

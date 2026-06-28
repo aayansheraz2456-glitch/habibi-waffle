@@ -5,6 +5,12 @@ export default defineConfig({
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 1200,
+    // Don't let the lazy 3D engine get hoisted into the entry's modulepreload —
+    // it must only load on demand, not on first paint.
+    modulePreload: {
+      resolveDependencies: (_filename, deps) =>
+        deps.filter((d) => !d.includes("three-vendor")),
+    },
     rollupOptions: {
       output: {
         // split big vendors into their own cacheable chunks. three / drei are

@@ -4,12 +4,23 @@ import Home from "./pages/Home";
 import MenuPage from "./pages/MenuPage";
 
 export default function App() {
-  // Warm the (lazy) 3D engine chunk during idle time — after the page is
-  // interactive — so scrolling to the models is instant, without adding any
-  // weight to the initial page load.
+  // After the page is interactive, during idle time, warm the 3D engine and
+  // pre-fetch + pre-decode the models (in a worker) so they appear instantly
+  // on scroll. Skipped on data-saver / very slow connections.
   useEffect(() => {
+    const conn = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g") {
+      return;
+    }
     const warm = () => {
       import("./components/ModelCanvas");
+      import("@react-three/drei")
+        .then((m) => {
+          ["/models/churro.glb", "/models/chinese.glb", "/models/fastfood.glb"].forEach(
+            (u) => m.useGLTF.preload(u, true)
+          );
+        })
+        .catch(() => {});
     };
     const ric = window as unknown as {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;

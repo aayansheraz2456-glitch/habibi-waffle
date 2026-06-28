@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import ScrollStory from "../components/ScrollStory";
+import ScrollVideoStory from "../components/ScrollVideoStory";
 import StripedPoster from "../components/StripedPoster";
 import Footer from "../components/Footer";
 
@@ -8,7 +8,7 @@ export default function Home() {
     <main className="bg-black">
       <Navbar />
       <div id="story">
-        <ScrollStory />
+        <ScrollVideoStory />
       </div>
       <div id="menus">
         <StripedPoster />

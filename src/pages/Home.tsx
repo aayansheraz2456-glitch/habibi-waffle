@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import ScrollVideoStory from "../components/ScrollVideoStory";
+import ScrollLogoHero from "../components/ScrollLogoHero";
 import ScrollPictures from "../components/ScrollPictures";
 import StripedPoster from "../components/StripedPoster";
 import Footer from "../components/Footer";
@@ -8,8 +8,8 @@ export default function Home() {
   return (
     <main className="bg-black">
       <Navbar />
-      <div id="story">
-        <ScrollVideoStory />
+      <div id="hero">
+        <ScrollLogoHero />
       </div>
       <div id="offer">
         <ScrollPictures />

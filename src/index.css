@@ -62,3 +62,50 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ---------- Shine sweep (logo reveal) ---------- */
+@keyframes sheen {
+  0% {
+    transform: translateX(-180%) rotate(18deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    transform: translateX(220%) rotate(18deg);
+    opacity: 0;
+  }
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 55%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  transform: translateX(-180%) rotate(18deg);
+  animation: sheen 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ---------- Respect reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .sheen::after,
+  .animate-float,
+  .animate-wiggle,
+  .animate-bounce {
+    animation: none !important;
+  }
+}

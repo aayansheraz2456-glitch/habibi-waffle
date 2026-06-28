@@ -1,12 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
   useTransform,
-  type MotionValue,
+  useMotionValueEvent,
 } from "framer-motion";
-import FoodArt from "./FoodArt";
-import Churro3D from "./Churro3D";
+import FoodModel from "./FoodModel";
 import Grain from "./Grain";
 import type { Category } from "../data/menu";
 
@@ -34,7 +33,7 @@ const PICTURES: Picture[] = [
     word: "CHINESE",
     num: "02",
     title: "Sizzling Chinese, Made Fresh",
-    text: "Saucy Manchurian, smoky chowmein and fried rice straight off a roaring flame.",
+    text: "Wok-fired stir-fries, saucy Manchurian and smoky chowmein straight off a roaring flame.",
   },
   {
     slug: "fastfood",
@@ -42,74 +41,40 @@ const PICTURES: Picture[] = [
     word: "BROAST",
     num: "03",
     title: "Broast · Pizza · Wraps",
-    text: "Special injected broast, hand-stretched pizzas and loaded wraps built for cravings.",
+    text: "Crispy fried broast, hand-stretched pizzas and loaded wraps built for cravings.",
   },
 ];
 
-// scroll windows for each picture's fade in/out
-const WINDOWS: { stops: number[]; ops: number[] }[] = [
-  { stops: [0, 0.28, 0.38], ops: [1, 1, 0] },
-  { stops: [0.3, 0.4, 0.6, 0.7], ops: [0, 1, 1, 0] },
-  { stops: [0.64, 0.74, 1], ops: [0, 1, 1] },
-];
+const N = PICTURES.length;
 
-function Picture({
-  pic,
-  win,
-  z,
-  progress,
-}: {
-  pic: Picture;
-  win: { stops: number[]; ops: number[] };
-  z: number;
-  progress: MotionValue<number>;
-}) {
-  const opacity = useTransform(progress, win.stops, win.ops);
-  const scale = useTransform(
-    progress,
-    [win.stops[0], win.stops[win.stops.length - 1]],
-    [1.06, 0.97]
-  );
-  const artY = useTransform(
-    progress,
-    [win.stops[0], win.stops[win.stops.length - 1]],
-    [60, -60]
-  );
-
+function Panel({ pic, active }: { pic: Picture; active: boolean }) {
   return (
-    <motion.div
-      style={{ opacity, backgroundColor: pic.color, zIndex: z }}
-      className="absolute inset-0 flex items-center justify-center overflow-hidden"
+    <div
+      className="relative flex h-screen w-screen flex-none items-center justify-center overflow-hidden"
+      style={{ backgroundColor: pic.color }}
     >
       <Grain className="z-[2]" />
 
-      {/* ghost word behind the art */}
-      <motion.span
+      {/* faint ghost word */}
+      <span
+        className="pointer-events-none absolute z-[1] select-none font-display uppercase leading-none text-white/[0.14]"
         style={{
-          scale,
           fontSize: "clamp(90px, 25vw, 360px)",
           letterSpacing: "-0.02em",
           whiteSpace: "nowrap",
         }}
-        className="pointer-events-none absolute z-[1] select-none font-display uppercase leading-none text-white/[0.14]"
       >
         {pic.word}
-      </motion.span>
+      </span>
 
-      {/* food art (3D model for the ice-cream/waffle picture) */}
-      <motion.div
-        style={{ y: artY }}
-        className="relative z-[3] mb-[12vh] sm:mb-[8vh]"
-      >
-        {pic.slug === "waffle" ? (
-          <Churro3D className="h-[46vh] w-[46vh] max-w-[88vw]" />
-        ) : (
-          <FoodArt
-            category={pic.slug}
-            className="h-[40vh] w-auto drop-shadow-[0_18px_28px_rgba(42,23,38,0.35)] sm:h-[50vh]"
-          />
-        )}
-      </motion.div>
+      {/* 3D model (live only when this panel is the active one) */}
+      <div className="relative z-[3] mb-[12vh] sm:mb-[8vh]">
+        <FoodModel
+          slug={pic.slug}
+          active={active}
+          className="h-[46vh] w-[46vh] max-w-[88vw]"
+        />
+      </div>
 
       {/* caption */}
       <div className="absolute bottom-8 left-4 z-[4] max-w-[420px] drop-shadow-[0_2px_12px_rgba(42,23,38,0.55)] sm:bottom-14 sm:left-16">
@@ -124,36 +89,55 @@ function Picture({
           {pic.text}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export default function ScrollPictures() {
   const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
+  // drive the horizontal slide from vertical scroll
+  const x = useTransform(scrollYProgress, [0, 1], ["0vw", `-${(N - 1) * 100}vw`]);
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const i = Math.min(N - 1, Math.max(0, Math.round(v * (N - 1))));
+    setActive((prev) => (prev === i ? prev : i));
+  });
+
   return (
     <section ref={ref} className="relative h-[320vh] bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* constant label — centred so it never collides with the fixed navbar */}
+        {/* centred label (clear of the fixed navbar) */}
         <div className="absolute left-1/2 top-[4.5rem] z-[40] -translate-x-1/2">
           <p className="font-body text-[11px] font-semibold uppercase tracking-[0.3em] text-white/85">
             What we offer
           </p>
         </div>
 
-        {PICTURES.map((pic, i) => (
-          <Picture
-            key={pic.slug}
-            pic={pic}
-            win={WINDOWS[i]}
-            z={i + 1}
-            progress={scrollYProgress}
-          />
-        ))}
+        {/* horizontal track */}
+        <motion.div style={{ x }} className="flex h-full" >
+          {PICTURES.map((pic, i) => (
+            <Panel key={pic.slug} pic={pic} active={active === i} />
+          ))}
+        </motion.div>
+
+        {/* progress dots */}
+        <div className="absolute bottom-6 left-1/2 z-[40] flex -translate-x-1/2 gap-2">
+          {PICTURES.map((p, i) => (
+            <span
+              key={p.slug}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                active === i ? "w-7 bg-white" : "w-2 bg-white/45"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

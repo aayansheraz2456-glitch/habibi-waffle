@@ -2,6 +2,7 @@ import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { ALL_MODEL_URLS } from "../modelUrls";
 
 // Touch devices: no drag-to-rotate (it hijacks page scroll). The model still
 // auto-spins, and the canvas lets touches pass through to the page.
@@ -42,9 +43,7 @@ function Model({ url, spin }: { url: string; spin: boolean }) {
 
 /** Pre-fetch + pre-decode the models (used for idle warm-up). */
 export function preloadModels() {
-  ["/models/churro.glb", "/models/chinese.glb", "/models/fastfood.glb"].forEach(
-    (u) => useGLTF.preload(u, true)
-  );
+  ALL_MODEL_URLS.forEach((u) => useGLTF.preload(u, true));
 }
 
 export default function ModelCanvas({

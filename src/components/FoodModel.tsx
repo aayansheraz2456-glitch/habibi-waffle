@@ -1,15 +1,10 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import FoodArt from "./FoodArt";
+import { MODEL_URLS } from "../modelUrls";
 import type { Category } from "../data/menu";
 
 // heavy three.js code — fetched only when a model is actually shown
 const ModelCanvas = lazy(() => import("./ModelCanvas"));
-
-const URLS: Record<Category, string> = {
-  waffle: "/models/churro.glb",
-  chinese: "/models/chinese.glb",
-  fastfood: "/models/fastfood.glb",
-};
 
 // camera height per model — the plate-shaped Chinese dish reads best tilted down
 const ELEVATION: Record<Category, number> = {
@@ -53,7 +48,7 @@ export default function FoodModel({
     <div ref={ref} className={`model-3d ${className}`}>
       {show ? (
         <Suspense fallback={<FoodArt category={slug} className="h-full w-auto" />}>
-          <ModelCanvas url={URLS[slug]} elevation={ELEVATION[slug]} />
+          <ModelCanvas url={MODEL_URLS[slug]} elevation={ELEVATION[slug]} />
         </Suspense>
       ) : (
         <FoodArt category={slug} className="h-full w-auto" />

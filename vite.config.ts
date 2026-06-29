@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ["**/*.glb"],
   build: {
     chunkSizeWarningLimit: 1200,
     // Don't let the lazy 3D engine get hoisted into the entry's modulepreload —

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
+  useSpring,
   useTransform,
   useMotionValueEvent,
 } from "framer-motion";
@@ -102,8 +103,13 @@ export default function ScrollPictures() {
     offset: ["start start", "end end"],
   });
 
-  // drive the horizontal slide from vertical scroll
-  const x = useTransform(scrollYProgress, [0, 1], ["0vw", `-${(N - 1) * 100}vw`]);
+  // spring-smoothed progress -> buttery horizontal slide
+  const px = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 24,
+    mass: 0.4,
+  });
+  const x = useTransform(px, [0, 1], ["0vw", `-${(N - 1) * 100}vw`]);
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const i = Math.min(N - 1, Math.max(0, Math.round(v * (N - 1))));

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ChevronDown } from "./icons";
 
 /**
@@ -14,14 +14,21 @@ export default function ScrollLogoHero() {
     offset: ["start start", "end start"],
   });
 
+  // spring-smoothed progress for buttery scroll-driven motion
+  const p = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 22,
+    mass: 0.3,
+  });
+
   // scroll-driven transforms (vertical)
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.55]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, -130]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 16]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0]);
-  const glow = useTransform(scrollYProgress, [0, 1], [1, 1.5]);
-  const taglineOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0]);
-  const hintOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
+  const scale = useTransform(p, [0, 1], [1, 0.55]);
+  const y = useTransform(p, [0, 1], [0, -130]);
+  const rotate = useTransform(p, [0, 1], [0, 16]);
+  const opacity = useTransform(p, [0, 0.7, 1], [1, 1, 0]);
+  const glow = useTransform(p, [0, 1], [1, 1.5]);
+  const taglineOpacity = useTransform(p, [0, 0.22], [1, 0]);
+  const hintOpacity = useTransform(p, [0, 0.1], [1, 0]);
 
   return (
     <section ref={ref} className="relative h-[200vh] bg-[#0c0710]">

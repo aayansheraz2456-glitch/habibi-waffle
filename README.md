@@ -1,5 +1,9 @@
 # Habibi Waffle
 
+**[Live demo →](https://aayansheraz.github.io/habibi-waffle/)**
+
+![Habibi Waffle screenshot](.github/screenshot.png)
+
 A scroll-driven story website for **Habibi Waffle**, Lahore — famous for waffles
 & ice cream, and also serving Chinese and fast food.
 
